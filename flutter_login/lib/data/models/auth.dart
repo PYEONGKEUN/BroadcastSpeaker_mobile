@@ -131,6 +131,7 @@ class AuthModel extends ChangeNotifier {
     await Future.delayed(Duration(seconds: 3));
     print("Logging In => $_username, $_password");
 
+
     if (_rememberMe) {
       SharedPreferences.getInstance().then((prefs) {
         prefs.setString("saved_username", _username);
@@ -161,5 +162,10 @@ class AuthModel extends ChangeNotifier {
       prefs.setString("user_data", null);
     });
     return;
+  }
+
+  Future<bool> logIn(String username, String passwd) async{
+    var response = await http.post("https://itbuddy.iptime.org/broadcastspeaker/andlogin");
+
   }
 }

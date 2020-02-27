@@ -5,6 +5,6 @@ enum AlertAction {
   agree,
 }
 
-const String apiURL = "https://reqres.in/api/users/2";
+const String apiURL = "https://itbuddy.iptime.org/braodcastspeaker/andlogin";
 const bool devMode = false;
 const double textScaleFactor = 1.0;
