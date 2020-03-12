@@ -24,8 +24,20 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  http: any
-  shared_preferences: any
+  http: ^0.12.0+4
+  shared_preferences: ^0.5.6+2
+  provider: ^4.0.4
+  #json convert
+  convert: ^2.1.1
+  #radio buttons
+  grouped_buttons: ^1.0.4
+  custom_radio: ^0.1.2
+  #audio player
+  audioplayers: ^0.14.0
+  #provide ios,android device storage path
+  path_provider: ^1.6.1
+  # like a mutil theading(flutter is sinle thread language)
+  isolate: ^2.0.3
 
 
 dev_dependencies:
