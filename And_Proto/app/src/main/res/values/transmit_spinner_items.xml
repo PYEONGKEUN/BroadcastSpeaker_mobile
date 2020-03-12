@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="transmit_spinner_items">
+        <item>전체</item>
+        <item>고객대기실</item>
+        <item>직원휴게실</item>
+        <item>창구</item>
+        <item>프론트</item>
+        <item>휴게실</item>
+        <item>정비실</item>
+        <item>사장실</item>
+        <item>사무실</item>
+    </string-array>
+</resources>

@@ -18,16 +18,20 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.and_proto.MainActivity;
+import com.example.and_proto.PreferenceManager;
 import com.example.and_proto.R;
 import com.example.and_proto.ui.login.LoginViewModel;
 import com.example.and_proto.ui.login.LoginViewModelFactory;
 import com.example.and_proto.vo.LoginVo;
+
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,6 +47,7 @@ import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -69,6 +74,61 @@ public class LoginActivity extends AppCompatActivity {
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+        final CheckBox checkBoxautoLogin = findViewById(R.id.checkBox_auto_login);
+
+        final Context mContext = this.getApplicationContext();
+
+        // 자동 로그인 구현부
+        //autoLogin = true
+        //id = "~"
+        //pw = "~"
+        if(PreferenceManager.getString(this.getApplicationContext(), "autoLogin").equals("")){
+            PreferenceManager.setString(this.getApplicationContext(), "autoLogin", "false");
+        }
+
+        if(PreferenceManager.getString(this.getApplicationContext(), "autoLogin").equals("true")){
+            // asnyctask로 구현한 웹통신 개체로
+            try{
+             Boolean result = loginViewModel.login(PreferenceManager.getString(this.getApplicationContext(), "id"),
+                    PreferenceManager.getString(this.getApplicationContext(), "pw"),
+                    getApplicationContext());
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+            if(result){
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+            }else{
+                Toast.makeText(getApplicationContext(),"로그인 실패",Toast.LENGTH_SHORT).show();
+            }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        checkBoxautoLogin.setOnClickListener(new CheckBox.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkBoxautoLogin.isChecked()) {
+                    // TODO : CheckBox is checked.
+                    PreferenceManager.setString(mContext, "autoLogin", "true");
+                    //아이디 비번 저장
+                    PreferenceManager.setString(mContext, "id", usernameEditText.getText().toString());
+                    PreferenceManager.setString(mContext, "pw", passwordEditText.getText().toString());
+                } else {
+                    // TODO : CheckBox is unchecked.
+                    PreferenceManager.setString(mContext, "autoLogin", "false");
+                }
+            }
+        });
+
+
+
+
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -102,6 +162,8 @@ public class LoginActivity extends AppCompatActivity {
                 setResult(Activity.RESULT_OK);
 
                 //Complete and destroy login activity once successful
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
                 finish();
             }
         });
@@ -130,8 +192,37 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString(),getApplicationContext());
+                    loadingProgressBar.setVisibility(View.VISIBLE);
+
+
+                    try {
+                        // asnyctask로 구현한 웹통신 개체로
+                        Boolean result =loginViewModel.login(usernameEditText.getText().toString(),passwordEditText.getText().toString(),getApplicationContext());
+                        loadingProgressBar.setVisibility(View.INVISIBLE);
+                        if(result){
+                            if (checkBoxautoLogin.isChecked()) {
+                                // TODO : CheckBox is checked.
+                                PreferenceManager.setString(mContext, "autoLogin", "true");
+                                //아이디 비번 저장
+                                PreferenceManager.setString(mContext, "id", usernameEditText.getText().toString());
+                                PreferenceManager.setString(mContext, "pw", passwordEditText.getText().toString());
+                            } else {
+                                // TODO : CheckBox is unchecked.
+                                PreferenceManager.setString(mContext, "autoLogin", "false");
+                            }
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            Toast.makeText(getApplicationContext(),"로그인 실패",Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return false;
             }
@@ -141,14 +232,46 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                //loginViewModel.login(usernameEditText.getText().toString(),passwordEditText.getText().toString(),getApplicationContext());
+                Boolean result;
+                try {
+                    result =loginViewModel.login(usernameEditText.getText().toString(),passwordEditText.getText().toString(),getApplicationContext());
+                    loadingProgressBar.setVisibility(View.INVISIBLE);
+                    if(result){
+                        if (checkBoxautoLogin.isChecked()) {
+                            // TODO : CheckBox is checked.
+                            PreferenceManager.setString(mContext, "autoLogin", "true");
+                            //아이디 비번 저장
+                            PreferenceManager.setString(mContext, "id", usernameEditText.getText().toString());
+                            PreferenceManager.setString(mContext, "pw", passwordEditText.getText().toString());
+                        } else {
+                            // TODO : CheckBox is unchecked.
+                            PreferenceManager.setString(mContext, "autoLogin", "false");
+                        }
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        Toast.makeText(getApplicationContext(),"로그인 실패",Toast.LENGTH_SHORT).show();
+                    }
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
+
+
+
             }
         });
+
+
+
     }
+
+
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();

@@ -5,13 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <TextView
-        android:id="@+id/textViewLog"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="1dp"
-        android:scrollbars="vertical"
-        android:background="#ffffff"
-        android:text="TextView" />
+        android:orientation="horizontal">
 
+
+        <Button
+            android:id="@+id/button_transmit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="transmit"
+            android:onClick="ButtonTransmitOnClick"/>
+
+        <Button
+            android:id="@+id/button_request"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="request"
+            android:onClick="ButtonRequestOnClick"/>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
