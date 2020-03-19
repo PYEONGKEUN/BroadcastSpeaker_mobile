@@ -3,11 +3,6 @@
     <string-array name="request_spinner_items">
         <item>고객대기실</item>
         <item>직원휴게실</item>
-        <item>창구</item>
-        <item>프론트</item>
-        <item>휴게실</item>
-        <item>정비실</item>
-        <item>사장실</item>
         <item>사무실</item>
     </string-array>
 </resources>

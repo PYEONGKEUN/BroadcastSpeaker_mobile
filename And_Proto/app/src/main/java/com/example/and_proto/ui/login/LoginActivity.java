@@ -55,7 +55,6 @@ import javax.net.ssl.HttpsURLConnection;
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
-    String uri = "https://itbuddy.iptime.org/broadcastspeaker/andlogin";
 
 
 

@@ -1,17 +1,22 @@
 package com.example.and_proto;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,9 +36,6 @@ import java.util.concurrent.ExecutionException;
 
 public class TransmitActivity extends AppCompatActivity {
 
-    final String BASE_URI = "http://itbuddy.iptime.org/broadcastspeaker";
-    final String TRANSMIT_PATH = "/transmit";
-    final String GET_NAME_PATH = "/getgrpmem";
 
     public static final int SEND_INFORMATION = 0;
     public static final int SEND_STOP = 1;
@@ -43,7 +45,9 @@ public class TransmitActivity extends AppCompatActivity {
     Spinner Spinner_place;
     Spinner Spinner_name;
 
+
     Context mContext;
+
 //    Handler handler;
 //    final Map<String, Object> data = new HashMap<String, Object>();
 
@@ -86,7 +90,7 @@ public class TransmitActivity extends AppCompatActivity {
         Spinner_place = (Spinner) findViewById(R.id.transmit_spinner_place);
         Spinner_name = (Spinner) findViewById(R.id.transmit_spinner_name);
         //Toast에 전해줄 Context
-        mContext = getApplicationContext();
+        mContext = this.getApplicationContext();
 
         //transmit_spinner_name 동적 생성 및 리스너 설정
         setSpinner_name();
@@ -120,6 +124,17 @@ public class TransmitActivity extends AppCompatActivity {
             }
         });
 
+        EditText_msg.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    transmit();
+                }
+                return false;
+            }
+        });
+
     }
 
 
@@ -134,11 +149,11 @@ public class TransmitActivity extends AppCompatActivity {
 
         ArrayAdapter<String> nameItem = new ArrayAdapter<String>(mContext, R.layout.support_simple_spinner_dropdown_item);
         try {
-            PostJsonAsyncTask postJsonAsyncTask = new PostJsonAsyncTask(BASE_URI + GET_NAME_PATH, (HashMap<String, Object>) data);
+            PostJsonAsyncTask postJsonAsyncTask = new PostJsonAsyncTask(Consts.BASE_URI + Consts.GET_NAME_PATH, (HashMap<String, Object>) data);
             postJsonAsyncTask.execute();
 
             result = postJsonAsyncTask.get();
-            Log.i(this.getClass().getName(), result);
+            Log.i("postJson result", result);
 
             JSONObject jsonObject = new JSONObject(result);
             if(jsonObject.getString("status").equals("complete")){
@@ -186,11 +201,10 @@ public class TransmitActivity extends AppCompatActivity {
 
     }
 
-
-    public void transmit(View v) throws ExecutionException, InterruptedException, JSONException {
-
+    public void transmit() {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("id", "skvudrms54");
+
         data.put("place", Spinner_place.getSelectedItem().toString());
 
         //정규식으로 숫자로만 이루어졌있는지 확인후
@@ -198,31 +212,56 @@ public class TransmitActivity extends AppCompatActivity {
         // 숫자로만 이루어져 있다면 type : name
         String regExp = "^[0-9]+$";
         String str = EditText_msg.getText().toString();
+        if(str.equals("")){
+            Toast.makeText(mContext, "메시지를 입력해주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(str.matches(regExp)){
             data.put("type", "number");
-            data.put("number", EditText_msg.getText().toString());
+            data.put("number", str);
         }else{
             data.put("type", "name");
-            data.put("name", EditText_msg.getText().toString());
+            data.put("name", str);
         }
-
-        PostJsonAsyncTask postJsonAsyncTask = new PostJsonAsyncTask(BASE_URI + TRANSMIT_PATH, (HashMap<String, Object>) data);
+        Log.i("postJson",data.toString());
+        PostJsonAsyncTask postJsonAsyncTask = new PostJsonAsyncTask(Consts.BASE_URI + Consts.TRANSMIT_PATH, (HashMap<String, Object>) data);
         postJsonAsyncTask.execute();
 
-        String result = postJsonAsyncTask.get();
-        Log.i(this.getClass().getName(), result);
-        JSONObject jsonObject = new JSONObject(result);
+        String result = null;
+        try {
+            result = postJsonAsyncTask.get();
 
-        if (jsonObject.getString("status").toString().equals("complete")) {
-            Toast.makeText(mContext, "성공", Toast.LENGTH_SHORT);
-        } else {
-            Toast.makeText(mContext, "실패", Toast.LENGTH_SHORT);
+        Log.i("postJson result", result);
+        JSONObject jsonObject = null;
+
+            jsonObject = new JSONObject(result);
+
+            if (jsonObject.getString("status").toString().equals("complete")) {
+                Toast.makeText(mContext, "성공", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mContext, "실패", Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
 
     }
 
 
 
+    public void onClickTransmit(View v)  {
+        transmit();
+    }
+
+
+
+
+
 }
+
+
 

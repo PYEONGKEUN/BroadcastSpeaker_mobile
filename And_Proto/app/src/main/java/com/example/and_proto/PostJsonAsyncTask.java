@@ -1,6 +1,7 @@
 package com.example.and_proto;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,10 +10,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class PostJsonAsyncTask extends AsyncTask<Void, Void, String> {
 
@@ -57,9 +59,9 @@ public class PostJsonAsyncTask extends AsyncTask<Void, Void, String> {
 
 
     public String PostJson(String _url, HashMap<String, Object> _map) throws JSONException {
-        // HttpURLConnection 참조 변수.
+        // HttpsURLConnection 참조 변수.
 
-        HttpURLConnection conn = null;
+        HttpsURLConnection conn = null;
         OutputStream os = null;
         InputStream is = null;
         ByteArrayOutputStream baos = null;
@@ -79,11 +81,11 @@ public class PostJsonAsyncTask extends AsyncTask<Void, Void, String> {
         }
 
         /**
-         * 2. HttpURLConnection을 통해 web의 데이터를 가져온다.
+         * 2. HttpsURLConnection을 통해 web의 데이터를 가져온다.
          * */
         try{
             URL url = new URL(_url);
-            conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpsURLConnection) url.openConnection();
 
             // [2-1]. urlConn 설정.
             conn.setConnectTimeout(CONN_TIMEOUT * 1000);
@@ -107,9 +109,10 @@ public class PostJsonAsyncTask extends AsyncTask<Void, Void, String> {
             // 실패 시 null을 리턴하고 메서드를 종료.
             String response;
 
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK)
+            if (conn.getResponseCode() != HttpsURLConnection.HTTP_OK) {
+                Log.i(this.getClass().getName(), conn.getResponseCode() + "");
                 return null;
-
+            }
             // [2-4]. 읽어온 결과물 리턴.
             // 요청한 URL의 출력물을 BufferedReader로 받는다.
 

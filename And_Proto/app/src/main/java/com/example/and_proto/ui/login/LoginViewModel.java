@@ -11,6 +11,7 @@ import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.example.and_proto.Consts;
 import com.example.and_proto.PostJsonAsyncTask;
 import com.example.and_proto.RequestHttpURLConnection;
 import com.example.and_proto.data.LoginRepository;
@@ -27,9 +28,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class LoginViewModel extends ViewModel {
+   // http://itbuddy.iptime.org/broadcastspeaker/loginjson
 
-    final String BASE_URI = "http://itbuddy.iptime.org/broadcastspeaker";
-    final String LOGIN_PATH = "/login.json";
 
     static Thread mainThread;
 
@@ -60,7 +60,7 @@ public class LoginViewModel extends ViewModel {
         data.put("id",username);
         data.put("pw",password);
 
-        PostJsonAsyncTask postJsonAsyncTask = new PostJsonAsyncTask(BASE_URI+LOGIN_PATH, data);
+        PostJsonAsyncTask postJsonAsyncTask = new PostJsonAsyncTask(Consts.BASE_URI+Consts.LOGIN_PATH, data);
         postJsonAsyncTask.execute();
 
         String result = postJsonAsyncTask.get();

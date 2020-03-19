@@ -56,5 +56,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="방송"
-        android:onClick="transmit"/>
+        android:onClick="onClickTransmit"/>
+
 </LinearLayout>
